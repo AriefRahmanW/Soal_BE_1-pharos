@@ -22,7 +22,9 @@ export class ObjectiveEntity{
     })
     Is_Finished: boolean;
 
-    @ManyToOne(() => TaskEntity, (task) => task.Objectives_List)
+    @ManyToOne(() => TaskEntity, (task) => task.Objective_List, {
+        onDelete: 'CASCADE'
+    })
     Task: TaskEntity;
 
 }

@@ -40,5 +40,5 @@ export class TaskEntity{
     Updated_Time: number;
 
     @OneToMany(() => ObjectiveEntity, (objective) => objective.Task)
-    Objectives_List: ObjectiveEntity[];
+    Objective_List: ObjectiveEntity[];
 }

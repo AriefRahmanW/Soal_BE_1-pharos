@@ -1,15 +1,37 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { TaskEntity } from "../entities/task.entity";
+import { Type, Transform } from "class-transformer";
+
+export class Pagination_Data{
+    Current_Page: number;
+
+    Max_Data_Per_Page: number;
+
+    Max_Page: number;
+
+    Total_All_Data: number;
+
+    constructor(currentPage: number, maxDataPerPage: number, totalAllData: number){
+        this.Current_Page = currentPage;
+        this.Max_Data_Per_Page = maxDataPerPage;
+        this.Total_All_Data = totalAllData;
+        this.Max_Page = Math.ceil(totalAllData / maxDataPerPage);
+    }
+}
 
 class List_Data{
     List_Data: TaskEntity[]
 
-    constructor(List_Data: TaskEntity[]){
+    Pagination_Data: Pagination_Data
+
+    constructor(List_Data: TaskEntity[], Pagination_Data: Pagination_Data){
         this.List_Data = List_Data;
+        this.Pagination_Data = Pagination_Data
     }
 }
 
 export class GetBySearchQueryDto{
+    @Type(() => Number)
     @ApiProperty({
         type: Number,
         description: 'Viewed Page',
@@ -17,6 +39,7 @@ export class GetBySearchQueryDto{
     })
     Page: number;
 
+    @Type(() => Number)
     @ApiProperty({
         type: Number,
         description: 'Page Limit',
@@ -31,6 +54,7 @@ export class GetBySearchQueryDto{
     })
     Title: string = undefined;
 
+    @Type(() => Number)
     @ApiPropertyOptional({
         type: Number,
         description: 'Unix Timestamp',
@@ -38,6 +62,7 @@ export class GetBySearchQueryDto{
     })
     Action_Time_Start: number = undefined;
 
+    @Type(() => Number)
     @ApiPropertyOptional({
         type: Number,
         description: 'Unix Timestamp',
@@ -45,6 +70,7 @@ export class GetBySearchQueryDto{
     })
     Action_Time_End: number = undefined;
 
+    @Transform(value => value.toString() === 'true')
     @ApiPropertyOptional({
         type: Boolean,
         description: 'Is Finished',
@@ -113,8 +139,8 @@ export class GetBySearchResponseDto{
     })
     data: List_Data
 
-    constructor(data: TaskEntity[]){
+    constructor(data: TaskEntity[], paginationData: Pagination_Data){
         this.message = 'Success';
-        this.data = new List_Data(data);
+        this.data = new List_Data(data, paginationData);
     }
 }

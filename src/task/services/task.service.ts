@@ -4,11 +4,12 @@ import { AddNewTaskBodyDto, AddNewTaskSuccessDto } from 'src/task/dto/add-new-ta
 import { Repository } from 'typeorm';
 import { DeleteTaskSuccessDto } from '../dto/delete-task.dto';
 import { ErrorKeys, ResponseErrorDto } from '../dto/error.dto';
-import { GetBySearchQueryDto, GetBySearchResponseDto } from '../dto/get-by-search.dto';
+import { GetBySearchQueryDto, GetBySearchResponseDto, Pagination_Data } from '../dto/get-by-search.dto';
 import { UpdateDataBodyDto, UpdateDataSuccessDto } from '../dto/update-data.dto';
 import { ObjectiveEntity } from '../entities/objective.entity';
 import { TaskEntity } from '../entities/task.entity';
-import { Like } from "typeorm";
+import { Like, MoreThanOrEqual, LessThanOrEqual, Between } from "typeorm";
+import { GetTaskByIdResponseDto } from '../dto/get-task-by-id.dto';
 
 @Injectable()
 export class TaskService {
@@ -20,18 +21,30 @@ export class TaskService {
     async getBySearch(query: GetBySearchQueryDto): Promise<GetBySearchResponseDto>{
         const tasks = await this.taskEntity.find({
             where: {
-                Title: query.Title ? Like(`%${query.Title}%`) : undefined,
+                Title: query.Title !== undefined ? Like(`${query.Title.toLowerCase()}`) : undefined,
+                Action_Time: query.Action_Time_Start !== undefined  && query.Action_Time_End !== undefined ? Between(query.Action_Time_Start, query.Action_Time_End) : query.Action_Time_Start !== undefined ? MoreThanOrEqual(query.Action_Time_Start) : query.Action_Time_End !== undefined ? LessThanOrEqual(query.Action_Time_End) : undefined,
+                Is_Finished: query.Is_Finished !== undefined ? query.Is_Finished : undefined,
             },
             relations: {
-                Objectives_List: true
-            }
+                Objective_List: true
+            },
+            take: query.Limit,
+            skip: query.Page > 1 ? (query.Page * query.Limit) - query.Limit : 0,
         })
 
-        if(tasks.length === 0){
-            throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
-        }
+        // if(tasks.length === 0){
+        //     throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
+        // }
 
-        return new GetBySearchResponseDto(tasks)
+        const totalAllData = await this.taskEntity.count();
+
+        const paginationData = new Pagination_Data(
+            query.Page,
+            query.Limit,
+            totalAllData
+        )
+
+        return new GetBySearchResponseDto(tasks, paginationData)
     }
 
     async addNewTask(data: AddNewTaskBodyDto): Promise<AddNewTaskSuccessDto> {
@@ -41,30 +54,31 @@ export class TaskService {
             Created_Time: Math.floor(new Date().getTime() / 1000),
             Updated_Time: Math.floor(new Date().getTime() / 1000),
         })
-        data.Objective_List.forEach(async (objectiveName) => {
+
+        for(const objectiveName of data.Objective_List){
             await this.objectiveEntity.save({
                 Task: newTask,
                 Objective_Name: objectiveName
             })
-        })
+        }
 
         return new AddNewTaskSuccessDto()
     }
 
-    async getTaskById(id: number): Promise<TaskEntity> {
+    async getTaskById(id: number): Promise<GetTaskByIdResponseDto> {
         const task = await this.taskEntity.findOne({
             where: {
                 Task_ID: id
             },
             relations: {
-                Objectives_List: true
+                Objective_List: true
             }
         })
         if (!task) {
             // TODO: Error model
             throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
         }
-        return task;
+        return new GetTaskByIdResponseDto(task);
     }
 
     async updateData(id: number, data: UpdateDataBodyDto): Promise<UpdateDataSuccessDto> {
@@ -82,21 +96,27 @@ export class TaskService {
             Title: data.Title,
         })
 
-        data.Objective_List.forEach(async (objective) => {
+        for(const objective of data.Objective_List){
             await this.objectiveEntity.save({
                 Objective_ID: objective.Objective_ID,
                 Objective_Name: objective.Objective_Name,
+                Is_Finished: objective.Is_Finished,
                 Task: task,
             })
-        })
+        }
 
-        // TODO: Task Is_Finished = true while all objectives are finished
-        await this.objectiveEntity.findAndCount({
+        const countIsFinished = await this.objectiveEntity.count({
             where: {
+                Is_Finished: false,
                 Task: task,
-                Is_Finished: true
             }
         })
+
+        if(countIsFinished === 0){
+            await this.taskEntity.update(task,{
+                Is_Finished: true,
+            })
+        }
 
         return new UpdateDataSuccessDto()
 

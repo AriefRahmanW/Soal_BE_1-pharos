@@ -1,70 +1,48 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ObjectiveEntity } from "../entities/objective.entity";
+import { TaskEntity } from "../entities/task.entity";
 
 export class GetTaskByIdResponseDto{
     @ApiProperty({
-        type: Number,
-        description: 'Task Id',
-        example: 1,
-    })
-    Task_ID: number;
-
-    @ApiProperty({
         type: String,
-        description: 'Task Title',
-        example: 'Task Monday 25',
+        description: 'Message',
+        example: 'Success',
     })
-    Title: string;
+    message: string;
 
     @ApiProperty({
-        type: Number,
-        description: 'Unix Timestamp',
-        example: 1640970000,
+        type: TaskEntity,
+        description: 'Task Data',
+        example: {
+            "Task_ID": 21,
+            "Title": "Grocery",
+            "Action_Time": 1644944400, // UNIX
+            "Created_Time": 1644998410, // UNIX
+            "Updated_Time": 1644998410, // UNIX
+            "Is_Finished": false, // INDIKATOR COMPLETED
+            "Objective_List": [
+                {
+                    "Objective_Name": "Milk 2lt",
+                    "Is_Finished": false // INDIKATOR CHECKED
+                },
+                {
+                    "Objective_Name": "Spoon set",
+                    "Is_Finished": false
+                },
+                {
+                    "Objective_Name": "Mineral Water 2btl",
+                    "Is_Finished": false
+                },
+                {
+                    "Objective_Name": "Some Snack",
+                    "Is_Finished": false
+                }
+            ]
+        }    
     })
-    Action_Time: Number;
+    data: TaskEntity;
 
-    @ApiProperty({
-        type: Boolean,
-        description: 'Is Finished',
-        example: false,
-    })
-    Is_Finished: boolean;
-
-    @ApiProperty({
-        type: Number,
-        description: 'Unix Timestamp',
-        example: 1640970000,
-    })
-    Created_Time: Number;
-
-    @ApiProperty({
-        type: Number,
-        description: 'Unix Timestamp',
-        example: 1640970000,
-    })
-    Updated_Time: Number;
-
-    @ApiProperty({
-        type: [ObjectiveEntity],
-        description: 'Objective List',
-        example: [
-            {
-                "Objective_Name": "Milk 2lt",
-                "Is_Finished": false // INDIKATOR CHECKED
-            },
-            {
-                "Objective_Name": "Spoon set",
-                "Is_Finished": false
-            },
-            {
-                "Objective_Name": "Mineral Water 2btl",
-                "Is_Finished": false
-            },
-            {
-                "Objective_Name": "Some Snack",
-                "Is_Finished": false
-            }
-        ]
-    })
-    Objectives_List: ObjectiveEntity[];
+    constructor(data: TaskEntity){
+        this.message = 'Success';
+        this.data = data;
+    }
 }
