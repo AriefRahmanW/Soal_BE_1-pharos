@@ -21,9 +21,7 @@
 </p>
 
 ## API Documentation
-
-
-
+http://localhost:5000/api/docs
 
 ## Installation
 
