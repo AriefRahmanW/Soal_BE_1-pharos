@@ -11,7 +11,7 @@ import { DeleteTaskSuccessDto } from '../dto/delete-task.dto';
 import { GetBySearchQueryDto, GetBySearchResponseDto } from '../dto/get-by-search.dto';
 import { UpdateDataBodyDto, UpdateDataSuccessDto } from '../dto/update-data.dto';
 
-ApiTags('Task')
+@ApiTags('Task')
 @Controller('task')
 export class TaskController {
     constructor(private readonly taskService: TaskService) {}

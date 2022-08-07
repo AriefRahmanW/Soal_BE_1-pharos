@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { TaskEntity } from "../entities/task.entity";
 import { Type, Transform } from "class-transformer";
+import { IsNumber } from "class-validator";
 
 export class Pagination_Data{
     Current_Page: number;
@@ -32,6 +33,7 @@ class List_Data{
 
 export class GetBySearchQueryDto{
     @Type(() => Number)
+    @IsNumber()
     @ApiProperty({
         type: Number,
         description: 'Viewed Page',
@@ -40,6 +42,7 @@ export class GetBySearchQueryDto{
     Page: number;
 
     @Type(() => Number)
+    @IsNumber()
     @ApiProperty({
         type: Number,
         description: 'Page Limit',
@@ -70,7 +73,7 @@ export class GetBySearchQueryDto{
     })
     Action_Time_End: number = undefined;
 
-    @Transform(value => value.toString() === 'true')
+    @Transform(value => value.toString() === 'true' ? true : value.toString() === 'false' ? false : undefined)
     @ApiPropertyOptional({
         type: Boolean,
         description: 'Is Finished',

@@ -8,7 +8,7 @@ import { GetBySearchQueryDto, GetBySearchResponseDto, Pagination_Data } from '..
 import { UpdateDataBodyDto, UpdateDataSuccessDto } from '../dto/update-data.dto';
 import { ObjectiveEntity } from '../entities/objective.entity';
 import { TaskEntity } from '../entities/task.entity';
-import { Like, MoreThanOrEqual, LessThanOrEqual, Between } from "typeorm";
+import { ILike, MoreThanOrEqual, LessThanOrEqual, Between } from "typeorm";
 import { GetTaskByIdResponseDto } from '../dto/get-task-by-id.dto';
 
 @Injectable()
@@ -21,20 +21,19 @@ export class TaskService {
     async getBySearch(query: GetBySearchQueryDto): Promise<GetBySearchResponseDto>{
         const tasks = await this.taskEntity.find({
             where: {
-                Title: query.Title !== undefined ? Like(`${query.Title.toLowerCase()}`) : undefined,
+                Title: query.Title !== undefined ? ILike(`%${query.Title.toLowerCase()}%`) : undefined,
                 Action_Time: query.Action_Time_Start !== undefined  && query.Action_Time_End !== undefined ? Between(query.Action_Time_Start, query.Action_Time_End) : query.Action_Time_Start !== undefined ? MoreThanOrEqual(query.Action_Time_Start) : query.Action_Time_End !== undefined ? LessThanOrEqual(query.Action_Time_End) : undefined,
                 Is_Finished: query.Is_Finished !== undefined ? query.Is_Finished : undefined,
             },
             relations: {
                 Objective_List: true
             },
+            order: {
+                Action_Time: 'DESC'
+            },
             take: query.Limit,
-            skip: query.Page > 1 ? (query.Page * query.Limit) - query.Limit : 0,
+            skip: (query.Page * query.Limit) - query.Limit,
         })
-
-        // if(tasks.length === 0){
-        //     throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
-        // }
 
         const totalAllData = await this.taskEntity.count();
 
@@ -75,8 +74,10 @@ export class TaskService {
             }
         })
         if (!task) {
-            // TODO: Error model
-            throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
+            throw new HttpException(new ResponseErrorDto(
+                ErrorKeys.ERROR_ID_NOT_FOUND,
+                'Task not found',
+            ), HttpStatus.OK);
         }
         return new GetTaskByIdResponseDto(task);
     }
@@ -88,12 +89,15 @@ export class TaskService {
             }
         })
         if (!task) {
-            // TODO: Error model
-            throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
+            throw new HttpException(new ResponseErrorDto(
+                ErrorKeys.ERROR_ID_NOT_FOUND,
+                'Task not found',
+            ), HttpStatus.OK);
         }
 
         await this.taskEntity.update(task,{
             Title: data.Title,
+            Updated_Time: Math.floor(new Date().getTime() / 1000),
         })
 
         for(const objective of data.Objective_List){
@@ -129,7 +133,10 @@ export class TaskService {
             }
         })
         if (!task) {
-
+            throw new HttpException(new ResponseErrorDto(
+                ErrorKeys.ERROR_ID_NOT_FOUND,
+                'Task not found',
+            ), HttpStatus.OK);
         }
         await this.taskEntity.delete(task)
 

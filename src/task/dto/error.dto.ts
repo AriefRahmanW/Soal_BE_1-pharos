@@ -1,7 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-// TODO: Add Error response dto
-
 export enum ErrorKeys{
     ERROR_PARAM = 'error_param',
     ERROR_INTERNAL_SERVER = 'error_internal_server',
@@ -36,4 +34,11 @@ export class ResponseErrorDto{
         example: 'Detail of an error',
     })
     error_data: any;
+
+    constructor(error_key: string, error_message: string){
+        this.message = "Failed";
+        this.error_key = error_key;
+        this.error_message = error_message;
+        this.error_data = {};
+    }
 }
