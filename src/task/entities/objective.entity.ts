@@ -22,7 +22,7 @@ export class ObjectiveEntity{
     })
     Is_Finished: boolean;
 
-    @ManyToOne(() => TaskEntity, (task) => task.objectives)
-    task: TaskEntity;
+    @ManyToOne(() => TaskEntity, (task) => task.Objectives_List)
+    Task: TaskEntity;
 
 }

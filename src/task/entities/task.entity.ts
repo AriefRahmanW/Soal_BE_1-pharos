@@ -17,9 +17,9 @@ export class TaskEntity{
     Title: string;
 
     @Column({
-        type: 'date',
+        type: 'int',
     })
-    Action_Time: Date;
+    Action_Time: number;
 
     @Column({
         type: 'boolean',
@@ -27,18 +27,18 @@ export class TaskEntity{
     })
     Is_Finished: boolean;
 
-    @CreateDateColumn({
-        type: 'timestamptz', 
-        default: () => 'CURRENT_TIMESTAMP' 
+    @Column({
+        type: 'int', 
+        // default: () => new Date().getTime()
     })
-    Created_Time: Date;
+    Created_Time: number;
 
-    @CreateDateColumn({
-        type: 'timestamptz', 
-        default: () => 'CURRENT_TIMESTAMP' 
+    @Column({
+        type: 'int', 
+        // default: () => new Date().getTime()
     })
-    Updated_Time: Date;
+    Updated_Time: number;
 
-    @OneToMany(() => ObjectiveEntity, (objective) => objective.task)
-    objectives: ObjectiveEntity[];
+    @OneToMany(() => ObjectiveEntity, (objective) => objective.Task)
+    Objectives_List: ObjectiveEntity[];
 }

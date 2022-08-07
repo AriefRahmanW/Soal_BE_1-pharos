@@ -25,7 +25,7 @@ import { ConfigService } from "@nestjs/config";
         database: configService.getOrThrow<string>('POSTGRES_DATABASE'),
         entities: [TaskEntity, ObjectiveEntity],
         synchronize: true,
-        migrationsRun: true,
+        migrationsRun: false,
         migrations: [__dirname + '/migrations/*{.ts,.js}'],
         logging: true,
       }),

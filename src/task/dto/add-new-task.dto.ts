@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsString, IsArray } from 'class-validator';
 
 export class AddNewTaskBodyDto{
+    @IsString()
     @ApiProperty({
         type: String,
         description: 'Task Title',
@@ -8,6 +10,7 @@ export class AddNewTaskBodyDto{
     })
     Title: string;
 
+    @IsNumber()
     @ApiProperty({
         type: Number,
         description: 'Unix Timestamp',
@@ -15,6 +18,7 @@ export class AddNewTaskBodyDto{
     })
     Action_Time: number;
 
+    @IsArray()
     @ApiProperty({
         type: [String],
         description: 'Objective Name',
@@ -36,4 +40,8 @@ export class AddNewTaskSuccessDto{
         example: 'Success',
     })
     message: string;
+
+    constructor(){
+        this.message = 'Success';
+    }
 }
