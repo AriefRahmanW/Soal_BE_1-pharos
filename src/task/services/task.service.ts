@@ -35,7 +35,13 @@ export class TaskService {
             skip: (query.Page * query.Limit) - query.Limit,
         })
 
-        const totalAllData = await this.taskEntity.count();
+        const totalAllData = await this.taskEntity.count({
+            where: {
+                Title: query.Title !== undefined ? ILike(`%${query.Title.toLowerCase()}%`) : undefined,
+                Action_Time: query.Action_Time_Start !== undefined  && query.Action_Time_End !== undefined ? Between(query.Action_Time_Start, query.Action_Time_End) : query.Action_Time_Start !== undefined ? MoreThanOrEqual(query.Action_Time_Start) : query.Action_Time_End !== undefined ? LessThanOrEqual(query.Action_Time_End) : undefined,
+                Is_Finished: query.Is_Finished !== undefined ? query.Is_Finished : undefined,
+            }
+        });
 
         const paginationData = new Pagination_Data(
             query.Page,

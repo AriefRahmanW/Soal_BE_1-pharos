@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Query, UsePipes, ValidationPipe, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query, Put, UseFilters } from '@nestjs/common';
 import { 
     AddNewTaskBodyDto, 
     AddNewTaskSuccessDto } from 'src/task/dto/add-new-task.dto';
@@ -10,14 +10,17 @@ import { GetTaskByIdResponseDto } from '../dto/get-task-by-id.dto';
 import { DeleteTaskSuccessDto } from '../dto/delete-task.dto';
 import { GetBySearchQueryDto, GetBySearchResponseDto } from '../dto/get-by-search.dto';
 import { UpdateDataBodyDto, UpdateDataSuccessDto } from '../dto/update-data.dto';
+import { QueryParamExceptionFilter } from '../exceptions/query-param.exception';
+import { InternalServerExceptionFilter } from '../exceptions/internal-server.exception';
 
 @ApiTags('Task')
+@UseFilters(new QueryParamExceptionFilter())
+@UseFilters(new InternalServerExceptionFilter())
 @Controller('task')
 export class TaskController {
     constructor(private readonly taskService: TaskService) {}
 
     @Get('get')
-    @UsePipes(new ValidationPipe({ transform: true }))
     @ApiResponse({status: 200, type: GetBySearchResponseDto})
     getBySearch(@Query() query: GetBySearchQueryDto): Promise<GetBySearchResponseDto> {
         return this.taskService.getBySearch(query);

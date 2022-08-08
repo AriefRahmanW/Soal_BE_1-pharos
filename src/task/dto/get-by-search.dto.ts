@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { TaskEntity } from "../entities/task.entity";
 import { Type, Transform } from "class-transformer";
-import { IsNumber } from "class-validator";
+import { IsNumber, IsNotEmpty } from "class-validator";
 
 export class Pagination_Data{
     Current_Page: number;
@@ -34,6 +34,7 @@ class List_Data{
 export class GetBySearchQueryDto{
     @Type(() => Number)
     @IsNumber()
+    @IsNotEmpty()
     @ApiProperty({
         type: Number,
         description: 'Viewed Page',
