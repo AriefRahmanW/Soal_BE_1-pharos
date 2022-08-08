@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, IsArray } from 'class-validator';
+import { IsNumber, IsString, IsArray, IsNotEmpty } from 'class-validator';
 
 export class AddNewTaskBodyDto{
     @IsString()
+    @IsNotEmpty()
     @ApiProperty({
         type: String,
         description: 'Task Title',
@@ -11,6 +12,7 @@ export class AddNewTaskBodyDto{
     Title: string;
 
     @IsNumber()
+    @IsNotEmpty()
     @ApiProperty({
         type: Number,
         description: 'Unix Timestamp',

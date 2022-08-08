@@ -23,7 +23,7 @@ export class TaskService {
             where: {
                 Title: query.Title !== undefined ? ILike(`%${query.Title.toLowerCase()}%`) : undefined,
                 Action_Time: query.Action_Time_Start !== undefined  && query.Action_Time_End !== undefined ? Between(query.Action_Time_Start, query.Action_Time_End) : query.Action_Time_Start !== undefined ? MoreThanOrEqual(query.Action_Time_Start) : query.Action_Time_End !== undefined ? LessThanOrEqual(query.Action_Time_End) : undefined,
-                Is_Finished: query.Is_Finished !== undefined ? query.Is_Finished : undefined,
+                Is_Finished: query.Is_Finished,
             },
             relations: {
                 Objective_List: true
@@ -39,7 +39,7 @@ export class TaskService {
             where: {
                 Title: query.Title !== undefined ? ILike(`%${query.Title.toLowerCase()}%`) : undefined,
                 Action_Time: query.Action_Time_Start !== undefined  && query.Action_Time_End !== undefined ? Between(query.Action_Time_Start, query.Action_Time_End) : query.Action_Time_Start !== undefined ? MoreThanOrEqual(query.Action_Time_Start) : query.Action_Time_End !== undefined ? LessThanOrEqual(query.Action_Time_End) : undefined,
-                Is_Finished: query.Is_Finished !== undefined ? query.Is_Finished : undefined,
+                Is_Finished: query.Is_Finished,
             }
         });
 
@@ -123,7 +123,7 @@ export class TaskService {
         })
 
         if(countIsFinished === 0){
-            await this.taskEntity.update(task,{
+            await this.taskEntity.update(id,{
                 Is_Finished: true,
             })
         }

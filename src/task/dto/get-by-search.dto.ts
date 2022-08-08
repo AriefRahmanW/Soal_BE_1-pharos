@@ -44,6 +44,7 @@ export class GetBySearchQueryDto{
 
     @Type(() => Number)
     @IsNumber()
+    @IsNotEmpty()
     @ApiProperty({
         type: Number,
         description: 'Page Limit',
@@ -74,7 +75,7 @@ export class GetBySearchQueryDto{
     })
     Action_Time_End: number = undefined;
 
-    @Transform(value => value.toString() === 'true' ? true : value.toString() === 'false' ? false : undefined)
+    @Transform(value => value.value === 'true' ? true : value.value === 'false' ? false : undefined)
     @ApiPropertyOptional({
         type: Boolean,
         description: 'Is Finished',
