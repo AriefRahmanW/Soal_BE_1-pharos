@@ -35,3 +35,8 @@ $ npm install
 # development
 $ npm run start
 ```
+
+Output
+```bash
+$ Application is running on: http://localhost:5000
+```
